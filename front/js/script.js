@@ -19,7 +19,7 @@ async function obterFilmes()
   }
 }
 
-async function cadastrarFilme()    // Código para essa função está na página 25 da apostila de nodejs. Devo fazer até a página 43 (finalizar a seção 2.19)
+async function cadastrarFilme()    // Devo fazer até a página 43 (finalizar a seção 2.19)
 {
   //constrói a URL completa
   const URLCompleta = `${protocolo}${baseURL}${filmesEndPoint}`

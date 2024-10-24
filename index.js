@@ -1,45 +1,48 @@
-// mongodb+srv://admin7:<db_password>@meu-cluster.s0iu0.mongodb.net/?retryWrites=true&w=majority&appName=meu-cluster
-
 const express = require("express")
 const cors = require("cors")
+const mongoose = require ('mongoose')
 const app = express()
 app.use(express.json())
 app.use(cors())
 
-// get http://localhost:3000/oi
-app.get("/oi", (req, res) => {
-  res.send("oi")
-})
+const Filme = mongoose.model ("Filme", mongoose.Schema({
+  titulo: {type: String},
+  sinopse: {type: String}
+  }))  
 
-let filmes = [
-  {
-    titulo: "Shrek",
-    sinopse: "Um ogro tem sua vida invadida por personagens de contos de fadas que acabam com a tranquilidade de seu lar. Ele faz um acordo pra resgatar uma princesa."
-  },
-  {
-    titulo: "Os Incríveis",
-    sinopse: "Depois do governo banir o uso de superpoderes, o maior herói do planeta, o Sr. Incrível, vive de forma pacata com sua família. Apesar de estar feliz com a vida doméstica, o Sr. Incrível ainda sente falta dos tempos em que viveu como super-herói, e sua grande chance de entrar em ação novamente surge quando um velho inimigo volta a atacar. Só que agora ele precisa contar com a ajuda de toda a família para vencer o vilão."
+async function conectarAoMongoDB() {
+  await
+  mongoose.connect(`mongodb+srv://admin7:root7@meu-cluster.s0iu0.mongodb.net/?retryWrites=true&w=majority&appName=meu-cluster`)
   }
 
-]
-
-app.get("/filmes", (req, res) => {
+app.get("/filmes", async (req, res) => {
+  const filmes = await Filme.find()
   res.json(filmes)
-})
+})  
 
-app.post("/filmes", (req, res) => {
-  // capturar as informações enviadas
+app.post("/filmes", async (req, res) => {
+  //obtém os dados enviados pelo cliente
   const titulo = req.body.titulo
   const sinopse = req.body.sinopse
 
-  // montar um objeto json filme com as informações capturadas
-  const novo_filme = {titulo: titulo, sinopse: sinopse}
-  
-  // acrescentar o novo filme à base
-  filmes.push(novo_filme)
+  //monta um objeto agrupando os dados. Ele representa um novo filme
+  //a seguir, construímos um objeto Filme a partir do modelo do mongoose
+  const filme = new Filme({titulo: titulo, sinopse: sinopse})
 
-  // para ilustrar, mostrar a base atualizada
+  //save salva o novo filme na base gerenciada pelo MongoDB
+  await filme.save()
+  const filmes = await Filme.find()
   res.json(filmes)
-})
+})  
 
-app.listen(3000, () => console.log("server up and running"))
+app.listen(3000, () => {
+  try
+  {
+    conectarAoMongoDB()
+    console.log("up and running")
+  }
+  catch (e)
+  {
+    console.log('Erro', e)
+  }
+})
